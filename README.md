@@ -57,6 +57,7 @@ mkcert -install
 mkcert localhost 127.0.0.1
 # Produces: localhost+2.pem and localhost+2-key.pem
 ```
+⚠️ If mkcert produces different names (e.g. localhost.pem / localhost-key.pem), replace them accordingly.
 
 4. **Run the app**
 ```bash
