@@ -27,8 +27,8 @@ requirements.txt   # Python dependencies
 
 1. **Clone & install dependencies**
 ```bash
-git clone <your-repo-url>
-cd <your-repo>
+git clone https://github.com/panahsuleymanof/auth_app.git
+cd auth_app
 python3 -m venv venv
 source venv/bin/activate   # macOS/Linux
 # venv\Scripts\activate  # Windows
