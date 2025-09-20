@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="az" data-theme="light">
+<head>
+  <meta charset="utf-8"/>
+  <title>{{ title or "Auth App" }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    /* Theme tokens */
+    :root{
+      --bg:#f7f7fb; --fg:#0b1220; --muted:#6b7280; --card:#ffffff; --border:#e6e8ee;
+      --primary:#1e40af; --primary-press:#163183; --primary-contrast:#ffffff;
+      --focus: 0 0 0 3px rgba(30,64,175,.18);
+    }
+    [data-theme="dark"]{
+      --bg:#0b1220; --fg:#e6e8ee; --muted:#a1a7b3; --card:#11182a; --border:#1f2a44;
+      --primary:#60a5fa; --primary-press:#4b86cf; --primary-contrast:#0b1220;
+      --focus: 0 0 0 3px rgba(96,165,250,.25);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      color:var(--fg); background:var(--bg);
+      display:flex; align-items:center; justify-content:center;
+      padding:24px;
+    }
+
+    .wrap{width:min(520px, 92vw)}
+    .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+    .brand{
+      font-weight:800; letter-spacing:.2px; line-height:1;
+      font-size:28px;   /* daha böyük başlıq */
+    }
+    .toggle{
+      padding:10px 14px; border:1px solid var(--border); background:transparent; color:var(--fg);
+      border-radius:12px; cursor:pointer; font-weight:600;
+    }
+
+    .card{
+      background:var(--card); border:1px solid var(--border); border-radius:16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,.08);
+      padding:24px;
+    }
+
+    h2{margin:0 0 14px 0; font-size:20px; font-weight:700}
+    label{display:block; margin:12px 0 6px; color:var(--muted); font-size:14px}
+    input{
+      display:block; width:100%; padding:12px 14px; border-radius:12px;
+      border:1px solid var(--border); background:transparent; color:var(--fg); outline:none;
+    }
+    input:focus{ box-shadow: var(--focus); border-color: var(--primary); }
+
+    .btn{
+      width:100%; padding:12px 14px; border:none; border-radius:12px;
+      background:var(--primary); color:var(--primary-contrast); cursor:pointer; font-weight:700;
+      transition: transform .04s ease;
+      margin-top:16px;
+    }
+    .btn:active{ transform: translateY(1px); background:var(--primary-press); }
+    .btn.secondary{
+      background:transparent; color:var(--fg); border:1px solid var(--border);
+    }
+    .row{margin-top:12px; font-size:14px; color:var(--muted)}
+    a{color:var(--primary); text-decoration:none}
+
+    .msg{padding:10px 12px; border-radius:12px; font-size:14px; margin-bottom:10px}
+    .error{background: rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.35)}
+    .success{background: rgba(22,163,74,.12); border:1px solid rgba(22,163,74,.35)}
+
+    form{margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">Auth App</div>
+      <button class="toggle" id="themeToggle">'Dark'</button>
+    </div>
+    <div class="card">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+
+    function setTheme(t){
+      root.setAttribute('data-theme', t);
+      localStorage.setItem('theme', t);
+      btn.textContent = (t === 'dark') ? 'Light' : 'Dark'; 
+    }
+    const saved = localStorage.getItem('theme');
+    setTheme(saved || 'light');
+    btn.addEventListener('click', ()=>{
+      const cur = root.getAttribute('data-theme');
+      setTheme(cur === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>

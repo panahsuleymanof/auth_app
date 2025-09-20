@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Qeydiyyat</h2>
+
+{% if error %}<div class="msg error">{{ error }}</div>{% endif %}
+{% if success %}<div class="msg success">{{ success }}</div>{% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="msg {{ 'error' if category=='error' else 'success' }}">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+<form method="post" action="{{ url_for('register') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>İstifadəçi adı</label>
+  <input name="username" required />
+
+  <label>E-mail</label>
+  <input name="email" type="email" required />
+
+  <label>Şifrə</label>
+  <input id="password" name="password" type="password" required />
+
+  <!-- Şifrə gücü göstəricisi -->
+  <div id="pw-meter" style="margin-top:8px;">
+    <div style="height:10px; width:100%; background:var(--border); border-radius:999px; overflow:hidden;">
+      <div id="pw-fill" style="height:100%; width:0%; background:#dc2626; transition:width .2s ease, background .2s ease;"></div>
+    </div>
+    <div id="pw-text" class="row">Şifrə gücü: zəif</div>
+  </div>
+
+  <button class="btn" type="submit">Qeydiyyatdan keç</button>
+</form>
+
+<div class="row">Artıq hesabınız var? <a href="{{ url_for('login') }}">Daxil ol</a>.</div>
+
+<script>
+  const pw = document.getElementById('password');
+  const fill = document.getElementById('pw-fill');
+  const txt = document.getElementById('pw-text');
+
+  function scorePassword(p) {
+    let s = 0;
+    if (!p) return 0;
+    s += Math.min(6, p.length) * 5; 
+    const variety = [/[a-z]/,/[A-Z]/,/\d/,/[^A-Za-z0-9]/].reduce((a,r)=>a+(r.test(p)?1:0),0);
+    s += variety * 10;
+    if (/(.)\1{2,}/.test(p)) s -= 10;
+    return Math.max(0, Math.min(100, s));
+  }
+
+  function colorFor(score){
+    if (score < 30) return '#dc2626';  
+    if (score < 60) return '#f59e0b';  
+    if (score < 80) return '#3b82f6';  
+    return '#16a34a';             
+  }
+  function labelFor(score){
+    if (score < 30) return 'zəif';
+    if (score < 60) return 'orta';
+    if (score < 80) return 'yaxşı';
+    return 'güclü';
+  }
+
+  pw.addEventListener('input', ()=>{
+    const s = scorePassword(pw.value);
+    fill.style.width = s + '%';
+    fill.style.background = colorFor(s);
+    txt.textContent = "Şifrə gücü: " + labelFor(s);
+  });
+</script>
+{% endblock %}

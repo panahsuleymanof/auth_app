@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<p class="row">Xoş gəlmisiniz, <strong>{{ username }}</strong>!</p>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, msg in messages %}
+      <div class="msg {{ 'error' if category=='error' else 'success' }}">{{ msg }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+<form method="post" action="{{ url_for('logout') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button class="btn secondary" type="submit">Çıxış</button>
+</form>
+{% endblock %}
