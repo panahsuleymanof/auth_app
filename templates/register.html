@@ -29,7 +29,11 @@
     </div>
     <div id="pw-text" class="row">Şifrə gücü: zəif</div>
   </div>
-
+{% if RECAPTCHA_SITE_KEY %}
+  <div class="captcha-row">
+    <div class="g-recaptcha-explicit" data-sitekey="{{ RECAPTCHA_SITE_KEY }}"></div>
+  </div>
+{% endif %}
   <button class="btn" type="submit">Qeydiyyatdan keç</button>
 </form>
 

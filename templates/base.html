@@ -5,7 +5,6 @@
   <title>{{ title or "Auth App" }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <style>
-    /* Theme tokens */
     :root{
       --bg:#f7f7fb; --fg:#0b1220; --muted:#6b7280; --card:#ffffff; --border:#e6e8ee;
       --primary:#1e40af; --primary-press:#163183; --primary-contrast:#ffffff;
@@ -31,7 +30,7 @@
     .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
     .brand{
       font-weight:800; letter-spacing:.2px; line-height:1;
-      font-size:28px;   /* daha böyük başlıq */
+      font-size:28px;
     }
     .toggle{
       padding:10px 14px; border:1px solid var(--border); background:transparent; color:var(--fg);
@@ -41,7 +40,7 @@
     .card{
       background:var(--card); border:1px solid var(--border); border-radius:16px;
       box-shadow: 0 10px 40px rgba(0,0,0,.08);
-      padding:24px;
+      padding:28px;
     }
 
     h2{margin:0 0 14px 0; font-size:20px; font-weight:700}
@@ -49,6 +48,7 @@
     input{
       display:block; width:100%; padding:12px 14px; border-radius:12px;
       border:1px solid var(--border); background:transparent; color:var(--fg); outline:none;
+      margin-bottom:10px;
     }
     input:focus{ box-shadow: var(--focus); border-color: var(--primary); }
 
@@ -70,13 +70,27 @@
     .success{background: rgba(22,163,74,.12); border:1px solid rgba(22,163,74,.35)}
 
     form{margin-top:6px}
+
+    .captcha-row{
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+      min-height:78px; 
+    }
+    @media (max-width: 360px){
+      .captcha-row .g-recaptcha, 
+      .captcha-row .g-recaptcha-explicit > div {
+        transform: scale(.9);
+        transform-origin: center center;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="topbar">
       <div class="brand">Auth App</div>
-      <button class="toggle" id="themeToggle">'Dark'</button>
+      <button class="toggle" id="themeToggle">Dark</button>
     </div>
     <div class="card">
       {% block content %}{% endblock %}
@@ -90,14 +104,70 @@
     function setTheme(t){
       root.setAttribute('data-theme', t);
       localStorage.setItem('theme', t);
-      btn.textContent = (t === 'dark') ? 'Light' : 'Dark'; 
+      btn.textContent = (t === 'dark') ? 'Light' : 'Dark';
+      window.dispatchEvent(new Event('theme-changed'));
     }
     const saved = localStorage.getItem('theme');
     setTheme(saved || 'light');
+
     btn.addEventListener('click', ()=>{
       const cur = root.getAttribute('data-theme');
       setTheme(cur === 'dark' ? 'light' : 'dark');
     });
+  </script>
+
+  <!-- reCAPTCHA explicit render -->
+  <script src="https://www.google.com/recaptcha/api.js?onload=onRecaptchaLoad&render=explicit" async defer></script>
+  <script>
+    let grecaptchaReady = false;
+    let captchaWidgetIds = [];
+
+    function currentTheme(){
+      return (document.documentElement.getAttribute('data-theme') === 'dark') ? 'dark' : 'light';
+    }
+
+    function renderAllCaptchas(){
+      if (!grecaptchaReady || typeof grecaptcha === 'undefined') return;
+
+      captchaWidgetIds = [];
+
+      document.querySelectorAll('.g-recaptcha-explicit').forEach((oldEl) => {
+        const newEl = oldEl.cloneNode(false); 
+        oldEl.replaceWith(newEl);
+
+        const siteKey = newEl.getAttribute('data-sitekey');
+        try {
+          const wid = grecaptcha.render(newEl, {
+            sitekey: siteKey,
+            theme: currentTheme()
+          });
+          captchaWidgetIds.push(wid);
+        } catch (e) {
+          setTimeout(() => {
+            try {
+              const wid2 = grecaptcha.render(newEl, {
+                sitekey: siteKey,
+                theme: currentTheme()
+              });
+              captchaWidgetIds.push(wid2);
+            } catch(e2){}
+          }, 50);
+        }
+      });
+    }
+
+    function onRecaptchaLoad(){
+      grecaptchaReady = true;
+      renderAllCaptchas();
+    }
+
+    let themeRaf = null;
+    window.addEventListener('theme-changed', () => {
+      if (themeRaf) cancelAnimationFrame(themeRaf);
+      themeRaf = requestAnimationFrame(renderAllCaptchas);
+    });
+
+    document.addEventListener('DOMContentLoaded', renderAllCaptchas);
   </script>
 </body>
 </html>

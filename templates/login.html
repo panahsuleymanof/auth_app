@@ -18,7 +18,11 @@
 
   <label>Şifrə</label>
   <input name="password" type="password" required />
-
+{% if RECAPTCHA_SITE_KEY %}
+  <div class="captcha-row">
+    <div class="g-recaptcha-explicit" data-sitekey="{{ RECAPTCHA_SITE_KEY }}"></div>
+  </div>
+{% endif %}
   <button class="btn" type="submit">Daxil ol</button>
 </form>
 
